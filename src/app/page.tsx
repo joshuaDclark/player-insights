@@ -27,12 +27,12 @@ export default function Home() {
                 Go to Dashboard
               </Link>
             ) : (
-              <a
+              <Link
                 href="/api/auth/login"
                 className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 md:text-lg"
               >
                 Get Started
-              </a>
+              </Link>
             )
           )}
         </div>
@@ -71,12 +71,12 @@ export default function Home() {
           Join FastBreak Insights today and unlock the power of basketball analytics.
         </p>
         {!isLoading && !user && (
-          <a
+          <Link
             href="/api/auth/login"
             className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-teal-600 bg-teal-100 hover:bg-teal-200 md:text-lg"
           >
             Start Free Trial
-          </a>
+          </Link>
         )}
       </div>
     </div>

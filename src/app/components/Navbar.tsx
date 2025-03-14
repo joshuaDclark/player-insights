@@ -39,21 +39,21 @@ export default function Navbar() {
                     </Link>
                     <div className="flex items-center space-x-4 border-l pl-4">
                       <span className="text-sm text-gray-500">{user.email}</span>
-                      <a
+                      <Link
                         href="/api/auth/logout"
                         className="bg-gray-100 text-gray-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-200"
                       >
                         Logout
-                      </a>
+                      </Link>
                     </div>
                   </div>
                 ) : (
-                  <a
+                  <Link
                     href="/api/auth/login"
                     className="bg-teal-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-teal-700"
                   >
                     Login
-                  </a>
+                  </Link>
                 )}
               </>
             )}

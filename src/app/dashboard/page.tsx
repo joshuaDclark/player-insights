@@ -12,15 +12,20 @@ export default function DashboardPage() {
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerStatsType | null>(null);
 
   useEffect(() => {
-    fetch('/api/players/stats')
-      .then((res) => res.json())
-      .then((data) => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch('/api/players/stats');
+        const data = await res.json();
         setPlayers(data.data);
         if (data.data.length > 0) {
           setSelectedPlayer(data.data[0]);
         }
-      })
-      .catch((error) => console.error('Error fetching stats:', error));
+      } catch (err) {
+        console.error('Failed to fetch player stats:', err);
+      }
+    };
+
+    fetchData();
   }, []);
 
   return (
