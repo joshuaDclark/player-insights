@@ -4,9 +4,6 @@ import type { PlayerStats } from '@/app/types/player';
 
 // Ensure the API key is a string, or throw an error at runtime
 const apiKey = process.env.BALLDONTLIE_API_KEY as string;
-if (!apiKey) {
-  throw new Error("Missing BALLDONTLIE_API_KEY in environment variables.");
-}
 
 const api = new BalldontlieAPI({ apiKey });
 console.log("API Key:", process.env.BALLDONTLIE_API_KEY);
