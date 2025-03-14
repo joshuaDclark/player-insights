@@ -7,7 +7,6 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   ResponsiveContainer,
-  Legend,
 } from 'recharts';
 import { PlayerStats } from '../types/player';
 
@@ -26,7 +25,7 @@ export default function PerformanceRadarChart({ player }: PerformanceRadarChartP
 
   return (
     <div className="w-full h-[400px] bg-white p-4 rounded-lg shadow-sm">
-      <h3 className="text-lg font-semibold mb-4">{player.name}'s Performance Radar</h3>
+      <h3 className="text-lg font-semibold mb-4">{player.name}&apos;s Performance Radar</h3>
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
           <PolarGrid />
