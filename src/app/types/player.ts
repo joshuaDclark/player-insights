@@ -1,16 +1,17 @@
 export interface PlayerStats {
   player_id: number;
   player_name: string;
-  games_played: number;
-  points: number;
-  rebounds: number;
-  assists: number;
+  position: string;
+  pts: number;
+  ast: number;
+  reb: number;
   fg_pct: number;
   fg3_pct: number;
-  minutes: string;
+  min: string;
 }
 
 export interface ShootingData {
+  player_id: number;
   player_name: string;
   fg_pct: number;
   fg3_pct: number;

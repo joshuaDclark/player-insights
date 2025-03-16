@@ -1,82 +1,123 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlayerStats } from '@/app/types/player';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { PlayerStats } from "@/app/types/player";
+import { useState } from "react";
 
-interface LeaderboardProps {
-  leaderboards: {
-    points: PlayerStats[];
-    rebounds: PlayerStats[];
-    assists: PlayerStats[];
-    fg_pct: PlayerStats[];
-    minutes: PlayerStats[];
-  };
+interface PlayerLeaderboardProps {
+  data: PlayerStats[];
 }
 
-export default function PlayerLeaderboard({ leaderboards }: LeaderboardProps) {
-  const formatValue = (value: number | string, category: string) => {
-    if (category === 'fg_pct') {
-      return `${(Number(value) * 100).toFixed(1)}%`;
+type StatCategory = {
+  value: string;
+  label: string;
+  statKey: keyof PlayerStats;
+  format: string;
+};
+
+const statCategories: StatCategory[] = [
+  { value: "points", label: "Points Per Game", statKey: "pts", format: "PPG" },
+  { value: "assists", label: "Assists Per Game", statKey: "ast", format: "APG" },
+  { value: "rebounds", label: "Rebounds Per Game", statKey: "reb", format: "RPG" },
+  { value: "fg", label: "Field Goal Percentage", statKey: "fg_pct", format: "FG%" },
+  { value: "minutes", label: "Minutes Per Game", statKey: "min", format: "MPG" },
+];
+
+export default function PlayerLeaderboard({ data }: PlayerLeaderboardProps) {
+  const [selectedCategory, setSelectedCategory] = useState<StatCategory>(statCategories[0]);
+
+  const getLeaders = (category: StatCategory) => {
+    if (category.statKey === "min") {
+      return [...data]
+        .sort((a, b) => {
+          const bVal = Number(b[category.statKey]);
+          const aVal = Number(a[category.statKey]);
+          return bVal - aVal;
+        })
+        .slice(0, 5);
     }
-    if (category === 'minutes') {
-      return value.toString();
-    }
-    return Number(value).toFixed(1);
+    return [...data]
+      .sort((a, b) => {
+        const bVal = Number(b[category.statKey]);
+        const aVal = Number(a[category.statKey]);
+        return bVal - aVal;
+      })
+      .slice(0, 5);
   };
 
-  const renderLeaderboardTable = (players: PlayerStats[], category: string) => (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-16">Rank</TableHead>
-          <TableHead>Player</TableHead>
-          <TableHead className="text-right">Value</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {players.map((player, index) => (
-          <TableRow key={player.player_id}>
-            <TableCell className="font-medium">{index + 1}</TableCell>
-            <TableCell>{player.player_name}</TableCell>
-            <TableCell className="text-right">
-              {formatValue(player[category as keyof PlayerStats], category)}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  );
+  const formatValue = (value: number | string, type: keyof PlayerStats) => {
+    if (type === 'fg_pct') return `${(value as number * 100).toFixed(1)}%`;
+    if (type === 'min') return value as string;
+    return (value as number).toFixed(1);
+  };
+
+  const leaders = getLeaders(selectedCategory);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Player Leaderboards</CardTitle>
+    <Card className="col-span-full">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-7">
+        <CardTitle className="text-2xl font-bold">Top Performers</CardTitle>
+        <div className="w-[280px]">
+          <Select
+            value={selectedCategory.value}
+            onValueChange={(value) => {
+              const category = statCategories.find(cat => cat.value === value);
+              if (category) setSelectedCategory(category);
+            }}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select category" />
+            </SelectTrigger>
+            <SelectContent>
+              {statCategories.map((category) => (
+                <SelectItem key={category.value} value={category.value}>
+                  {category.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="points" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="points">Points</TabsTrigger>
-            <TabsTrigger value="rebounds">Rebounds</TabsTrigger>
-            <TabsTrigger value="assists">Assists</TabsTrigger>
-            <TabsTrigger value="fg_pct">FG%</TabsTrigger>
-            <TabsTrigger value="minutes">Minutes</TabsTrigger>
-          </TabsList>
-          <TabsContent value="points">
-            {renderLeaderboardTable(leaderboards.points, 'points')}
-          </TabsContent>
-          <TabsContent value="rebounds">
-            {renderLeaderboardTable(leaderboards.rebounds, 'rebounds')}
-          </TabsContent>
-          <TabsContent value="assists">
-            {renderLeaderboardTable(leaderboards.assists, 'assists')}
-          </TabsContent>
-          <TabsContent value="fg_pct">
-            {renderLeaderboardTable(leaderboards.fg_pct, 'fg_pct')}
-          </TabsContent>
-          <TabsContent value="minutes">
-            {renderLeaderboardTable(leaderboards.minutes, 'minutes')}
-          </TabsContent>
-        </Tabs>
+        <div className="rounded-lg border bg-card">
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="w-[80px] text-center">#</TableHead>
+                <TableHead>Player</TableHead>
+                <TableHead className="w-[100px]">Position</TableHead>
+                <TableHead className="text-right w-[120px]">{selectedCategory.format}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {leaders.map((player, index) => (
+                <TableRow key={player.player_id} className="hover:bg-muted/50">
+                  <TableCell className="text-center font-medium">
+                    {index + 1}
+                  </TableCell>
+                  <TableCell className="font-medium">{player.player_name}</TableCell>
+                  <TableCell>{player.position}</TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {formatValue(player[selectedCategory.statKey], selectedCategory.statKey)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );

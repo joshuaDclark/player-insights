@@ -10,6 +10,7 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import { ShootingData } from '@/app/types/player';
+import { colors, baseChartOptions } from '@/app/utils/chartTheme';
 
 ChartJS.register(
   CategoryScale,
@@ -25,37 +26,45 @@ interface ShootingEfficiencyProps {
 }
 
 export default function ShootingEfficiency({ data }: ShootingEfficiencyProps) {
+  // Sort players by field goal percentage
+  const sortedData = [...data].sort((a, b) => b.fg_pct - a.fg_pct);
+
   const chartData = {
-    labels: data.map(player => player.player_name),
+    labels: sortedData.map(player => player.player_name),
     datasets: [
       {
         label: 'Field Goal %',
-        data: data.map(player => (player.fg_pct * 100).toFixed(1)),
-        backgroundColor: 'rgba(75, 192, 192, 0.5)',
-        borderColor: 'rgba(75, 192, 192, 1)',
-        borderWidth: 1,
+        data: sortedData.map(player => (player.fg_pct * 100).toFixed(1)),
+        backgroundColor: colors.primary.light,
+        borderColor: colors.primary.main,
+        borderWidth: 2,
+        borderRadius: 4,
       },
       {
         label: '3-Point %',
-        data: data.map(player => (player.fg3_pct * 100).toFixed(1)),
-        backgroundColor: 'rgba(153, 102, 255, 0.5)',
-        borderColor: 'rgba(153, 102, 255, 1)',
-        borderWidth: 1,
+        data: sortedData.map(player => (player.fg3_pct * 100).toFixed(1)),
+        backgroundColor: colors.secondary.light,
+        borderColor: colors.secondary.main,
+        borderWidth: 2,
+        borderRadius: 4,
       },
     ],
   };
 
   const options = {
-    responsive: true,
-    maintainAspectRatio: false,
+    ...baseChartOptions,
     plugins: {
+      ...baseChartOptions.plugins,
       legend: {
-        position: 'top' as const,
-      },
-      title: {
-        display: false,
+        ...baseChartOptions.plugins.legend,
+        labels: {
+          ...baseChartOptions.plugins.legend.labels,
+          usePointStyle: true,
+          pointStyle: 'circle',
+        },
       },
       tooltip: {
+        ...baseChartOptions.plugins.tooltip,
         callbacks: {
           label: function(context: any) {
             return `${context.dataset.label}: ${context.raw}%`;
@@ -65,23 +74,39 @@ export default function ShootingEfficiency({ data }: ShootingEfficiencyProps) {
     },
     scales: {
       y: {
+        ...baseChartOptions.scales.y,
         beginAtZero: true,
         max: 100,
         title: {
           display: true,
           text: 'Percentage',
+          font: {
+            size: 12,
+            weight: 'bold',
+          },
+          padding: { top: 10, bottom: 0 },
+        },
+      },
+      x: {
+        ...baseChartOptions.scales.x,
+        ticks: {
+          ...baseChartOptions.scales.x.ticks,
+          maxRotation: 45,
+          minRotation: 45,
         },
       },
     },
+    barPercentage: 0.8,
+    categoryPercentage: 0.9,
   };
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <CardHeader>
         <CardTitle>Shooting Efficiency</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px]">
+        <div className="h-[350px] pt-4">
           <Bar data={chartData} options={options} />
         </div>
       </CardContent>

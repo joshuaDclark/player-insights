@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Chart as ChartJS,
   RadialLinearScale,
@@ -11,6 +10,7 @@ import {
 } from 'chart.js';
 import { Radar } from 'react-chartjs-2';
 import { PlayerStats } from '@/app/types/player';
+import { colors, baseChartOptions } from '@/app/utils/chartTheme';
 
 ChartJS.register(
   RadialLinearScale,
@@ -22,62 +22,84 @@ ChartJS.register(
 );
 
 interface PerformanceRadarProps {
-  player: PlayerStats | null;
-  onPlayerChange: (player: PlayerStats) => void;
-  allPlayers: PlayerStats[];
+  player: PlayerStats;
 }
 
-export default function PerformanceRadar({ player, onPlayerChange, allPlayers }: PerformanceRadarProps) {
-  if (!player) return null;
-
+export default function PerformanceRadar({ player }: PerformanceRadarProps) {
   const chartData = {
-    labels: ['Points', 'Rebounds', 'Assists', 'FG%', 'Minutes'],
+    labels: ['Points', 'Assists', 'Rebounds', 'FG%', '3P%'],
     datasets: [
       {
         label: player.player_name,
         data: [
-          player.points,
-          player.rebounds,
-          player.assists,
+          player.pts,
+          player.ast,
+          player.reb,
           player.fg_pct * 100,
-          parseFloat(player.minutes),
+          player.fg3_pct * 100,
         ],
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        borderColor: 'rgba(75, 192, 192, 1)',
-        borderWidth: 1,
+        backgroundColor: `${colors.primary.light}80`,
+        borderColor: colors.primary.main,
+        borderWidth: 2,
+        pointBackgroundColor: colors.primary.main,
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: colors.primary.main,
+        pointRadius: 4,
+        pointHoverRadius: 6,
       },
     ],
   };
 
   const options = {
-    responsive: true,
-    maintainAspectRatio: false,
+    ...baseChartOptions,
     scales: {
       r: {
         angleLines: {
-          display: true,
+          color: colors.neutral.light,
+        },
+        grid: {
+          color: colors.neutral.light,
+        },
+        pointLabels: {
+          font: {
+            size: 12,
+            weight: 'bold' as const,
+          },
+          color: colors.neutral.dark,
         },
         suggestedMin: 0,
-        suggestedMax: Math.max(
-          ...allPlayers.map(p => p.points),
-          ...allPlayers.map(p => p.rebounds),
-          ...allPlayers.map(p => p.assists),
-          ...allPlayers.map(p => p.fg_pct * 100),
-          ...allPlayers.map(p => parseFloat(p.minutes))
-        ),
+        ticks: {
+          stepSize: 20,
+          font: {
+            size: 10,
+          },
+          color: colors.neutral.main,
+        },
       },
     },
     plugins: {
+      ...baseChartOptions.plugins,
       legend: {
-        position: 'top' as const,
+        ...baseChartOptions.plugins.legend,
+        labels: {
+          ...baseChartOptions.plugins.legend.labels,
+          usePointStyle: true,
+          pointStyle: 'circle',
+          font: {
+            size: 12,
+            weight: 'bold' as const,
+          },
+        },
       },
       tooltip: {
+        ...baseChartOptions.plugins.tooltip,
         callbacks: {
           label: function(context: any) {
             const label = context.dataset.label || '';
-            const value = context.raw;
+            const value = context.raw.toFixed(1);
             const metric = context.label;
-            return `${label}: ${metric === 'FG%' ? value.toFixed(1) + '%' : value.toFixed(1)}`;
+            return `${label}: ${value}${metric.includes('%') ? '%' : ''}`;
           }
         }
       }
@@ -85,34 +107,12 @@ export default function PerformanceRadar({ player, onPlayerChange, allPlayers }:
   };
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <CardHeader>
         <CardTitle>Performance Radar</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="mb-6">
-          <Select
-            value={player.player_id.toString()}
-            onValueChange={(value) => {
-              const selectedPlayer = allPlayers.find(p => p.player_id.toString() === value);
-              if (selectedPlayer) {
-                onPlayerChange(selectedPlayer);
-              }
-            }}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select a player" />
-            </SelectTrigger>
-            <SelectContent>
-              {allPlayers.map((p) => (
-                <SelectItem key={p.player_id} value={p.player_id.toString()}>
-                  {p.player_name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="h-[300px]">
+        <div className="h-[350px] pt-4">
           <Radar data={chartData} options={options} />
         </div>
       </CardContent>

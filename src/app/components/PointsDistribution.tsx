@@ -10,6 +10,7 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import { PlayerStats } from '@/app/types/player';
+import { colors, baseChartOptions } from '@/app/utils/chartTheme';
 
 ChartJS.register(
   CategoryScale,
@@ -25,64 +26,78 @@ interface PointsDistributionProps {
 }
 
 export default function PointsDistribution({ data }: PointsDistributionProps) {
-  // Sort players by points in descending order
-  const sortedData = [...data].sort((a, b) => b.points - a.points);
+  // Sort players by points per game
+  const sortedData = [...data].sort((a, b) => b.pts - a.pts);
 
   const chartData = {
     labels: sortedData.map(player => player.player_name),
     datasets: [
       {
         label: 'Points Per Game',
-        data: sortedData.map(player => player.points),
-        backgroundColor: sortedData.map(() => 'rgba(54, 162, 235, 0.5)'),
-        borderColor: sortedData.map(() => 'rgba(54, 162, 235, 1)'),
-        borderWidth: 1,
+        data: sortedData.map(player => player.pts.toFixed(1)),
+        backgroundColor: colors.accent.light,
+        borderColor: colors.accent.main,
+        borderWidth: 2,
+        borderRadius: 4,
       },
     ],
   };
 
   const options = {
-    responsive: true,
-    maintainAspectRatio: false,
+    ...baseChartOptions,
     plugins: {
+      ...baseChartOptions.plugins,
       legend: {
-        position: 'top' as const,
-      },
-      title: {
-        display: false,
+        ...baseChartOptions.plugins.legend,
+        labels: {
+          ...baseChartOptions.plugins.legend.labels,
+          usePointStyle: true,
+          pointStyle: 'circle',
+        },
       },
       tooltip: {
+        ...baseChartOptions.plugins.tooltip,
         callbacks: {
           label: function(context: any) {
-            return `Points: ${context.raw.toFixed(1)}`;
+            return `Points: ${context.raw}`;
           }
         }
       }
     },
     scales: {
       y: {
+        ...baseChartOptions.scales.y,
         beginAtZero: true,
         title: {
           display: true,
           text: 'Points Per Game',
+          font: {
+            size: 12,
+            weight: 'bold',
+          },
+          padding: { top: 10, bottom: 0 },
         },
       },
       x: {
+        ...baseChartOptions.scales.x,
         ticks: {
+          ...baseChartOptions.scales.x.ticks,
           maxRotation: 45,
           minRotation: 45,
         },
       },
     },
+    barPercentage: 0.8,
+    categoryPercentage: 0.9,
   };
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <CardHeader>
         <CardTitle>Points Distribution</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px]">
+        <div className="h-[350px] pt-4">
           <Bar data={chartData} options={options} />
         </div>
       </CardContent>
