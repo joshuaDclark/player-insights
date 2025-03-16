@@ -78,12 +78,16 @@ export default function PlayerLeaderboard({ data }: PlayerLeaderboardProps) {
               if (category) setSelectedCategory(category);
             }}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full bg-white cursor-pointer">
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="border shadow-md bg-white cursor-pointer">
               {statCategories.map((category) => (
-                <SelectItem key={category.value} value={category.value}>
+                <SelectItem 
+                  key={category.value} 
+                  value={category.value}
+                  className="hover:bg-slate-200 cursor-pointer"
+                >
                   {category.label}
                 </SelectItem>
               ))}
