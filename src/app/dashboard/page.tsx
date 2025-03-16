@@ -1,73 +1,88 @@
 "use client";
 import { useEffect, useState } from "react";
-import PlayerStats from '../components/PlayerStats';
-import LeaderboardTable from '../components/LeaderboardTable';
-import ShootingEfficiencyChart from '../components/ShootingEfficiencyChart';
-import PerformanceRadarChart from '../components/PerformanceRadarChart';
-import PointsDistributionChart from '../components/PointsDistributionChart';
-import { PlayerStats as PlayerStatsType } from '../types/player';
+import PlayerLeaderboard from '@/app/components/PlayerLeaderboard';
+import ShootingEfficiency from '@/app/components/ShootingEfficiency';
+import PerformanceRadar from '@/app/components/PerformanceRadar';
+import PointsDistribution from '@/app/components/PointsDistribution';
+import { DashboardData, PlayerStats } from '@/app/types/player';
 
-export default function DashboardPage() {
-  const [players, setPlayers] = useState<PlayerStatsType[]>([]);
-  const [selectedPlayer, setSelectedPlayer] = useState<PlayerStatsType | null>(null);
+export default function Dashboard() {
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerStats | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch('/api/players/stats');
-        const data = await res.json();
-        setPlayers(data.data);
-        if (data.data.length > 0) {
-          setSelectedPlayer(data.data[0]);
+        const response = await fetch('/api/hornets/dashboard');
+        if (!response.ok) {
+          throw new Error('Failed to fetch dashboard data');
+        }
+        const dashboardData = await response.json();
+        setData(dashboardData);
+        if (dashboardData.allPlayers.length > 0) {
+          setSelectedPlayer(dashboardData.allPlayers[0]);
         }
       } catch (err) {
-        console.error('Failed to fetch player stats:', err);
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
   }, []);
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p>No data available</p>
+      </div>
+    );
+  }
+
+  const handlePlayerChange = (player: PlayerStats) => {
+    setSelectedPlayer(player);
+  };
+
   return (
-    <div className="space-y-8 p-6">
-      <h1 className="text-3xl font-bold">Player Statistics Dashboard</h1>
-      
-      {/* Player Cards */}
-      <div className="bg-white p-6 rounded-lg shadow-sm">
-        <h2 className="text-xl font-semibold mb-4">Player Overview</h2>
-        <PlayerStats />
-      </div>
-
-      {/* Leaderboard */}
-      <div className="bg-white p-6 rounded-lg shadow-sm">
-        <h2 className="text-xl font-semibold mb-4">Statistical Leaders</h2>
-        <LeaderboardTable players={players} />
-      </div>
-
-      {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ShootingEfficiencyChart players={players} />
-        {selectedPlayer && <PerformanceRadarChart player={selectedPlayer} />}
-        <PointsDistributionChart players={players} />
-      </div>
-
-      {/* Player Selector */}
-      <div className="bg-white p-6 rounded-lg shadow-sm">
-        <h2 className="text-xl font-semibold mb-4">Select Player for Radar Chart</h2>
-        <select
-          className="w-full max-w-xs p-2 border rounded-md"
-          value={selectedPlayer?.id || ''}
-          onChange={(e) => {
-            const player = players.find(p => p.id === e.target.value);
-            if (player) setSelectedPlayer(player);
-          }}
-        >
-          {players.map((player) => (
-            <option key={player.id} value={player.id}>
-              {player.name}
-            </option>
-          ))}
-        </select>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-4xl font-bold mb-2">Charlotte Hornets Dashboard</h1>
+      <p className="text-muted-foreground mb-8">
+        Season {data.metadata.season} • Last updated: {new Date(data.metadata.last_updated).toLocaleString()}
+      </p>
+      <div className="grid grid-cols-1 gap-6">
+        <div>
+          <PlayerLeaderboard leaderboards={data.leaderboards} />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <ShootingEfficiency data={data.shootingEfficiency} />
+          <PerformanceRadar
+            player={selectedPlayer}
+            onPlayerChange={handlePlayerChange}
+            allPlayers={data.allPlayers}
+          />
+        </div>
+        <div>
+          <PointsDistribution data={data.allPlayers} />
+        </div>
       </div>
     </div>
   );

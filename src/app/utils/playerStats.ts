@@ -1,13 +1,13 @@
-import { PlayerStats, PlayerStatsError } from '../types/player';
+import { ProcessedPlayerStats, PlayerStatsError } from '../types/player';
 
 const CACHE_TIME = 5 * 60 * 1000; // 5 minutes in milliseconds
-let cache: { data: PlayerStats[] | null; timestamp: number } = {
+let cache: { data: ProcessedPlayerStats[] | null; timestamp: number } = {
   data: null,
   timestamp: 0,
 };
 
 export async function fetchPlayerStats(): Promise<{
-  data: PlayerStats[] | null;
+  data: ProcessedPlayerStats[] | null;
   error: PlayerStatsError | null;
 }> {
   try {
@@ -17,7 +17,7 @@ export async function fetchPlayerStats(): Promise<{
       return { data: cache.data, error: null };
     }
 
-    const response = await fetch('/api/players/stats', {
+    const response = await fetch('/api/players/processed', {
       next: { revalidate: 300 }, // 5 minutes revalidation
     });
 
@@ -25,15 +25,15 @@ export async function fetchPlayerStats(): Promise<{
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const data = await response.json();
+    const result = await response.json();
     
     // Update cache
     cache = {
-      data: data.data,
+      data: result.data,
       timestamp: now,
     };
 
-    return { data: data.data, error: null };
+    return { data: result.data, error: null };
   } catch (error) {
     console.error('Error fetching player stats:', error);
     return {

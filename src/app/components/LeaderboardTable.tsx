@@ -1,68 +1,92 @@
 'use client';
 
-import { PlayerStats } from '../types/player';
+import { useState } from 'react';
+import { ProcessedPlayerStats } from '../types/player';
 
 interface LeaderboardTableProps {
-  players: PlayerStats[];
+  players: ProcessedPlayerStats[];
 }
 
-type StatCategory = {
-  key: keyof PlayerStats;
-  label: string;
-  format: (value: number) => string;
-};
-
-const categories: StatCategory[] = [
-  { key: 'pointsPerGame', label: 'Points', format: (v) => v.toFixed(1) },
-  { key: 'rebounds', label: 'Rebounds', format: (v) => v.toFixed(1) },
-  { key: 'assists', label: 'Assists', format: (v) => v.toFixed(1) },
-  { key: 'fieldGoalPercentage', label: 'FG%', format: (v) => `${v.toFixed(1)}%` },
-  { key: 'threePointPercentage', label: '3P%', format: (v) => `${v.toFixed(1)}%` },
-];
+type SortField = 'pointsPerGame' | 'rebounds' | 'assists' | 'fieldGoalPercentage' | 'threePointPercentage' | 'minutesPlayed';
+type SortDirection = 'asc' | 'desc';
 
 export default function LeaderboardTable({ players }: LeaderboardTableProps) {
-  const getTopFive = (category: keyof PlayerStats) => {
-    return [...players]
-      .sort((a, b) => (b[category] as number) - (a[category] as number))
-      .slice(0, 5);
+  const [sortField, setSortField] = useState<SortField>('pointsPerGame');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+
+  const handleSort = (field: SortField) => {
+    if (field === sortField) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('desc');
+    }
   };
+
+  const sortedPlayers = [...players].sort((a, b) => {
+    const multiplier = sortDirection === 'asc' ? 1 : -1;
+    return (a[sortField] - b[sortField]) * multiplier;
+  });
+
+  const headers: { field: SortField; label: string }[] = [
+    { field: 'pointsPerGame', label: 'PPG' },
+    { field: 'rebounds', label: 'REB' },
+    { field: 'assists', label: 'AST' },
+    { field: 'fieldGoalPercentage', label: 'FG%' },
+    { field: 'threePointPercentage', label: '3P%' },
+    { field: 'minutesPlayed', label: 'MIN' }
+  ];
 
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full bg-white rounded-lg overflow-hidden">
+      <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
-            {categories.map((category) => (
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Player
+            </th>
+            {headers.map(({ field, label }) => (
               <th
-                key={category.key}
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                key={field}
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort(field)}
               >
-                {category.label}
+                <div className="flex items-center space-x-1">
+                  <span>{label}</span>
+                  {sortField === field && (
+                    <span className="ml-1">
+                      {sortDirection === 'desc' ? '↓' : '↑'}
+                    </span>
+                  )}
+                </div>
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
-          {[0, 1, 2, 3, 4].map((index) => (
-            <tr key={index} className="hover:bg-gray-50">
-              {categories.map((category) => {
-                const topPlayers = getTopFive(category.key);
-                const player = topPlayers[index];
-                return (
-                  <td key={category.key} className="px-6 py-4 whitespace-nowrap">
-                    {player && (
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {player.name}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {category.format(player[category.key] as number)}
-                        </div>
-                      </div>
-                    )}
-                  </td>
-                );
-              })}
+        <tbody className="bg-white divide-y divide-gray-200">
+          {sortedPlayers.map((player) => (
+            <tr key={player.id} className="hover:bg-gray-50">
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                {player.name}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {player.pointsPerGame.toFixed(1)}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {player.rebounds.toFixed(1)}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {player.assists.toFixed(1)}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {(player.fieldGoalPercentage * 100).toFixed(1)}%
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {(player.threePointPercentage * 100).toFixed(1)}%
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {player.minutesPlayed.toFixed(1)}
+              </td>
             </tr>
           ))}
         </tbody>
