@@ -9,7 +9,7 @@ export async function GET() {
     const startTime = Date.now();
 
     // Make request to our stats endpoint
-    const response = await fetch('http://localhost:3000/api/test/hornets/stats');
+    const response = await fetch('/api/test/hornets/stats');
     const data = await response.json();
 
     const endTime = Date.now();

@@ -6,7 +6,7 @@ const CACHE_DURATION = 3600; // 1 hour
 export async function GET() {
   try {
     // Fetch data from our hybrid endpoint
-    const statsResponse = await fetch('http://localhost:3000/api/test/hornets/stats');
+    const statsResponse = await fetch('/api/test/hornets/stats');
 
     if (!statsResponse.ok) {
       throw new Error(`Stats API error: ${statsResponse.status}`);
