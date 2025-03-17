@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PlayerStats } from '@/app/types/player';
 import { Skeleton } from "@/components/ui/skeleton";
+import SeasonStats from '@/app/components/SeasonStats';
 
 // Move active roster outside component to prevent recreation
 const ACTIVE_ROSTER = [
@@ -170,6 +171,8 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between pb-2 border-b">
         <h1 className="text-3xl font-bold tracking-tight">Charlotte Hornets Dashboard</h1>
       </div>
+
+      <SeasonStats data={data} />
 
       <PlayerLeaderboard data={data} />
 
