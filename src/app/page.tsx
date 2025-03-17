@@ -11,7 +11,7 @@ export default function Home() {
       {/* Hero Section */}
       <div className="text-center py-12">
         <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl md:text-6xl">
-          <span className="block text-teal-600">FastBreak Insights</span>
+          <span className="block text-teal-600">NBA Insights</span>
           <span className="block text-gray-600 mt-2">Basketball Analytics Platform</span>
         </h1>
         <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import PlayerLeaderboard from '@/app/components/PlayerLeaderboard';
 import ShootingEfficiency from '@/app/components/ShootingEfficiency';
 import PerformanceRadar from '@/app/components/PerformanceRadar';
@@ -7,12 +7,57 @@ import PointsDistribution from '@/app/components/PointsDistribution';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PlayerStats } from '@/app/types/player';
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Move active roster outside component to prevent recreation
+const ACTIVE_ROSTER = [
+  "LaMelo Ball",
+  "Brandon Miller",
+  "Miles Bridges",
+  "Terry Rozier",
+  "Mark Williams",
+  "P.J. Washington",
+  "Gordon Hayward",
+  "Nick Richards",
+  "Bryce McGowens",
+  "Theo Maledon",
+  "JT Thor",
+  "Nathan Mensah",
+  "Cody Martin",
+  "Frank Ntilikina",
+  "Davis Bertans",
+  "Amari Bailey",
+  "James Bouknight",
+  "Aleksej Pokusevski",
+  "Leaky Black",
+  "Tre Scott",
+  "Kobi Simmons",
+  "Xavier Sneed",
+  "Jordan Miller",
+  "Marques Bolden",
+  "Jaylen Sims",
+  "Nick Smith Jr.",
+  "Kai Jones",
+  "Seth Curry"
+];
 
 export default function DashboardPage() {
   const [data, setData] = useState<PlayerStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerStats | null>(null);
+
+  // Memoize expensive calculations
+  const teamStats = useMemo(() => {
+    if (!data.length) return null;
+    return {
+      avgPoints: (data.reduce((acc, p) => acc + p.pts, 0) / data.length).toFixed(1),
+      avgFgPct: (data.reduce((acc, p) => acc + p.fg_pct, 0) / data.length * 100).toFixed(1),
+      maxPoints: data.reduce((max, p) => Math.max(max, p.pts), 0).toFixed(1),
+      maxAssists: data.reduce((max, p) => Math.max(max, p.ast), 0).toFixed(1),
+      maxRebounds: data.reduce((max, p) => Math.max(max, p.reb), 0).toFixed(1),
+    };
+  }, [data]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,15 +68,10 @@ export default function DashboardPage() {
         }
         const result = await response.json();
         
-        // Validate the response data
         if (!result || !Array.isArray(result.data) || result.data.length === 0) {
           throw new Error('Invalid or empty data received');
         }
 
-        console.log('Total players in raw data:', result.data.length);
-        console.log('Player names:', result.data.map((p: any) => p.player_name).join(', '));
-
-        // Validate each player object has required fields
         const validatedData = result.data.filter((player: any) => {
           return (
             player &&
@@ -46,40 +86,8 @@ export default function DashboardPage() {
           );
         });
 
-        // Filter to only include 2023-24 active roster players
-        const activeRoster = [
-          "LaMelo Ball",
-          "Brandon Miller",
-          "Miles Bridges",
-          "Terry Rozier",
-          "Mark Williams",
-          "P.J. Washington",
-          "Gordon Hayward",
-          "Nick Richards",
-          "Bryce McGowens",
-          "Theo Maledon",
-          "JT Thor",
-          "Nathan Mensah",
-          "Cody Martin",
-          "Frank Ntilikina",
-          "Davis Bertans",
-          "Amari Bailey",
-          "James Bouknight",
-          "Aleksej Pokusevski",
-          "Leaky Black",
-          "Tre Scott",
-          "Kobi Simmons",
-          "Xavier Sneed",
-          "Jordan Miller",
-          "Marques Bolden",
-          "Jaylen Sims",
-          "Nick Smith Jr.",
-          "Kai Jones",
-          "Seth Curry"
-        ];
-
         const rosterData = validatedData.filter((player: PlayerStats) => 
-          activeRoster.includes(player.player_name)
+          ACTIVE_ROSTER.includes(player.player_name)
         );
 
         if (rosterData.length === 0) {
@@ -87,7 +95,7 @@ export default function DashboardPage() {
         }
 
         setData(rosterData);
-        setSelectedPlayer(rosterData[0]); // Set first player as default
+        setSelectedPlayer(rosterData[0]);
         setError(null);
       } catch (err) {
         console.error('Dashboard data fetch error:', err);
@@ -104,15 +112,52 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading dashboard data...</div>
+      <div className="light container mx-auto p-6 space-y-8">
+        <div className="flex items-center justify-between pb-2 border-b">
+          <h1 className="text-3xl font-bold tracking-tight">Charlotte Hornets Dashboard</h1>
+        </div>
+        
+        <Card className="col-span-full">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-7">
+            <CardTitle className="text-2xl font-bold">Top Performers</CardTitle>
+            <div className="w-[280px]">
+              <Skeleton className="h-10 w-full" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {[...Array(5)].map((_, i) => (
+                <Skeleton key={i} className="h-12 w-full" />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-8 w-48" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-[200px] w-full" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-8 w-48" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-[200px] w-full" />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
 
   if (error || data.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="light flex items-center justify-center min-h-screen">
         <div className="text-lg text-red-500">
           {error || 'No player data available'}
         </div>
@@ -121,7 +166,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-8">
+    <div className="light container mx-auto p-6 space-y-8">
       <div className="flex items-center justify-between pb-2 border-b">
         <h1 className="text-3xl font-bold tracking-tight">Charlotte Hornets Dashboard</h1>
       </div>
@@ -144,15 +189,11 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex justify-between items-center py-1 border-b border-muted/40">
                     <span className="text-muted-foreground">Avg Points</span>
-                    <span className="font-medium tabular-nums">
-                      {(data.reduce((acc, p) => acc + p.pts, 0) / data.length).toFixed(1)}
-                    </span>
+                    <span className="font-medium tabular-nums">{teamStats?.avgPoints}</span>
                   </div>
                   <div className="flex justify-between items-center py-1 border-b border-muted/40">
                     <span className="text-muted-foreground">Avg FG%</span>
-                    <span className="font-medium tabular-nums">
-                      {(data.reduce((acc, p) => acc + p.fg_pct, 0) / data.length * 100).toFixed(1)}%
-                    </span>
+                    <span className="font-medium tabular-nums">{teamStats?.avgFgPct}%</span>
                   </div>
                 </div>
               </div>
@@ -161,21 +202,15 @@ export default function DashboardPage() {
                 <div className="grid gap-2">
                   <div className="flex justify-between items-center py-1 border-b border-muted/40">
                     <span className="text-muted-foreground">Points</span>
-                    <span className="font-medium tabular-nums">
-                      {data.reduce((max, p) => Math.max(max, p.pts), 0).toFixed(1)}
-                    </span>
+                    <span className="font-medium tabular-nums">{teamStats?.maxPoints}</span>
                   </div>
                   <div className="flex justify-between items-center py-1 border-b border-muted/40">
                     <span className="text-muted-foreground">Assists</span>
-                    <span className="font-medium tabular-nums">
-                      {data.reduce((max, p) => Math.max(max, p.ast), 0).toFixed(1)}
-                    </span>
+                    <span className="font-medium tabular-nums">{teamStats?.maxAssists}</span>
                   </div>
                   <div className="flex justify-between items-center py-1 border-b border-muted/40">
                     <span className="text-muted-foreground">Rebounds</span>
-                    <span className="font-medium tabular-nums">
-                      {data.reduce((max, p) => Math.max(max, p.reb), 0).toFixed(1)}
-                    </span>
+                    <span className="font-medium tabular-nums">{teamStats?.maxRebounds}</span>
                   </div>
                 </div>
               </div>
