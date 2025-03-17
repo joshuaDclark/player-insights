@@ -24,8 +24,11 @@ interface TeamAverages {
 export async function GET() {
   try {
     if (!API_KEY) {
+      console.error('API key is missing');
       throw new Error('API key not configured. Please set BALLDONTLIE_API_KEY environment variable.');
     }
+
+    console.log('API key is present, attempting to fetch data...');
 
     // Create a Response object with the data
     const response = await generateResponse();
@@ -42,7 +45,11 @@ export async function GET() {
     });
 
   } catch (error) {
-    console.error('Failed to get Hornets statistics:', error);
+    console.error('Failed to get Hornets statistics:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
     
     return NextResponse.json(
       {
@@ -67,7 +74,10 @@ export async function GET() {
 }
 
 async function generateResponse() {
+  console.log('Starting generateResponse...');
+  
   // First get the Hornets team
+  console.log('Fetching teams data...');
   const teamsResponse = await fetch(`${BASE_URL}/teams`, {
     headers: new Headers({
       'Authorization': API_KEY || ''
@@ -78,18 +88,35 @@ async function generateResponse() {
   });
   
   if (!teamsResponse.ok) {
-    console.error('Teams response error:', await teamsResponse.text());
-    throw new Error(`Teams HTTP error! status: ${teamsResponse.status}`);
+    const errorText = await teamsResponse.text();
+    console.error('Teams response error:', {
+      status: teamsResponse.status,
+      statusText: teamsResponse.statusText,
+      body: errorText
+    });
+    throw new Error(`Teams HTTP error! status: ${teamsResponse.status} - ${errorText}`);
   }
 
   const teamsData = await teamsResponse.json();
+  console.log('Teams data received:', {
+    hasData: !!teamsData,
+    dataLength: teamsData.data?.length
+  });
+
   const hornets = teamsData.data.find((team: any) => team.name === 'Hornets');
   
   if (!hornets) {
+    console.error('Hornets team not found in response:', teamsData);
     throw new Error('Could not find Hornets team data');
   }
 
+  console.log('Found Hornets team:', {
+    id: hornets.id,
+    name: hornets.name
+  });
+
   // Get all Hornets players
+  console.log('Fetching players data...');
   const playersResponse = await fetch(
     `${BASE_URL}/players?per_page=100&team_ids[]=${hornets.id}`,
     {
@@ -103,13 +130,23 @@ async function generateResponse() {
   );
 
   if (!playersResponse.ok) {
-    console.error('Players response error:', await playersResponse.text());
-    throw new Error(`Players HTTP error! status: ${playersResponse.status}`);
+    const errorText = await playersResponse.text();
+    console.error('Players response error:', {
+      status: playersResponse.status,
+      statusText: playersResponse.statusText,
+      body: errorText
+    });
+    throw new Error(`Players HTTP error! status: ${playersResponse.status} - ${errorText}`);
   }
 
   const playersData = await playersResponse.json();
+  console.log('Players data received:', {
+    hasData: !!playersData,
+    playerCount: playersData.data?.length
+  });
   
   if (!playersData.data || playersData.data.length === 0) {
+    console.error('No players found in response:', playersData);
     throw new Error('No players found in Hornets roster');
   }
 

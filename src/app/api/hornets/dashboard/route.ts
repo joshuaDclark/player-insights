@@ -13,16 +13,31 @@ const getBaseUrl = () => {
 
 export async function GET() {
   try {
+    const baseUrl = getBaseUrl();
+    console.log('Attempting to fetch from:', `${baseUrl}/api/test/hornets/stats`);
+    
     // Fetch data from our hybrid endpoint using absolute URL
-    const statsResponse = await fetch(`${getBaseUrl()}/api/test/hornets/stats`);
+    const statsResponse = await fetch(`${baseUrl}/api/test/hornets/stats`);
 
     if (!statsResponse.ok) {
-      throw new Error(`Stats API error: ${statsResponse.status}`);
+      const errorText = await statsResponse.text();
+      console.error('Stats API error details:', {
+        status: statsResponse.status,
+        statusText: statsResponse.statusText,
+        body: errorText
+      });
+      throw new Error(`Stats API error: ${statsResponse.status} - ${errorText}`);
     }
 
     const statsData = await statsResponse.json();
+    console.log('Received stats data:', {
+      hasData: !!statsData,
+      hasPlayers: !!statsData.data?.players,
+      playerCount: statsData.data?.players?.length
+    });
     
     if (!statsData.data?.players || !Array.isArray(statsData.data.players)) {
+      console.error('Invalid data format:', statsData);
       throw new Error('Invalid data format received from stats API');
     }
 
