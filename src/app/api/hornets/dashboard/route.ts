@@ -3,62 +3,38 @@ import { PlayerStats } from '@/app/types/player';
 import { getMockStatsById, generateMockStats } from '@/app/api/mocks/playerStats';
 
 const CACHE_DURATION = 3600; // 1 hour
-const BASE_URL = 'https://api.balldontlie.io/v1';
-const API_KEY = process.env.BALLDONTLIE_API_KEY;
-
-// Fallback mock players data
-const mockPlayers = [
-  { id: 1, first_name: 'LaMelo', last_name: 'Ball', position: 'G' },
-  { id: 2, first_name: 'Brandon', last_name: 'Miller', position: 'F' },
-  { id: 3, first_name: 'Miles', last_name: 'Bridges', position: 'F' },
-  { id: 4, first_name: 'Gordon', last_name: 'Hayward', position: 'F' },
-  { id: 5, first_name: 'Mark', last_name: 'Williams', position: 'C' },
-  { id: 6, first_name: 'Terry', last_name: 'Rozier', position: 'G' },
-  { id: 7, first_name: 'PJ', last_name: 'Washington', position: 'F' },
-  { id: 8, first_name: 'Cody', last_name: 'Martin', position: 'F' },
-  { id: 9, first_name: 'Frank', last_name: 'Ntilikina', position: 'G' },
-  { id: 10, first_name: 'Davis', last_name: 'Bertans', position: 'F' }
-];
 
 export async function GET() {
   try {
-    // Fetch real player data from balldontlie API
-    console.log('Attempting to fetch players from balldontlie API...');
-    const playersResponse = await fetch(
-      `${BASE_URL}/players?per_page=100&team_ids[]=1`, // 1 is the Hornets team ID
-      {
-        headers: {
-          'Authorization': API_KEY || ''
-        }
-      }
-    );
+    // Use mock data directly
+    const mockPlayers = [
+      { id: 1, first_name: 'LaMelo', last_name: 'Ball', position: 'G' },
+      { id: 2, first_name: 'Brandon', last_name: 'Miller', position: 'F' },
+      { id: 3, first_name: 'Miles', last_name: 'Bridges', position: 'F' },
+      { id: 4, first_name: 'Gordon', last_name: 'Hayward', position: 'F' },
+      { id: 5, first_name: 'Mark', last_name: 'Williams', position: 'C' },
+      { id: 6, first_name: 'Terry', last_name: 'Rozier', position: 'G' },
+      { id: 7, first_name: 'PJ', last_name: 'Washington', position: 'F' },
+      { id: 8, first_name: 'Cody', last_name: 'Martin', position: 'F' },
+      { id: 9, first_name: 'Frank', last_name: 'Ntilikina', position: 'G' },
+      { id: 10, first_name: 'Davis', last_name: 'Bertans', position: 'F' },
+      { id: 11, first_name: 'Amari', last_name: 'Bailey', position: 'G' },
+      { id: 12, first_name: 'James', last_name: 'Bouknight', position: 'G' },
+      { id: 13, first_name: 'Aleksej', last_name: 'Pokusevski', position: 'F' },
+      { id: 14, first_name: 'Leaky', last_name: 'Black', position: 'G' },
+      { id: 15, first_name: 'Tre', last_name: 'Scott', position: 'F' },
+      { id: 16, first_name: 'Kobi', last_name: 'Simmons', position: 'G' },
+      { id: 17, first_name: 'Xavier', last_name: 'Sneed', position: 'F' },
+      { id: 18, first_name: 'Jordan', last_name: 'Miller', position: 'F' },
+      { id: 19, first_name: 'Marques', last_name: 'Bolden', position: 'C' },
+      { id: 20, first_name: 'Jaylen', last_name: 'Sims', position: 'G' },
+      { id: 21, first_name: 'Nick', last_name: 'Smith Jr.', position: 'G' },
+      { id: 22, first_name: 'Kai', last_name: 'Jones', position: 'C' },
+      { id: 23, first_name: 'Seth', last_name: 'Curry', position: 'G' }
+    ];
 
-    if (!playersResponse.ok) {
-      console.error('API Response not OK:', {
-        status: playersResponse.status,
-        statusText: playersResponse.statusText,
-        headers: Object.fromEntries(playersResponse.headers.entries())
-      });
-      throw new Error(`Failed to fetch players: ${playersResponse.status}`);
-    }
-
-    const playersData = await playersResponse.json();
-    console.log('Received players data:', {
-      dataLength: playersData.data?.length,
-      hasData: !!playersData.data,
-      isArray: Array.isArray(playersData.data)
-    });
-    
-    let playersToProcess;
-    if (!playersData.data || !Array.isArray(playersData.data) || playersData.data.length === 0) {
-      console.log('No valid player data from API, falling back to mock data');
-      playersToProcess = mockPlayers;
-    } else {
-      playersToProcess = playersData.data;
-    }
-
-    // Combine real player data with mock stats
-    const playerStats: PlayerStats[] = playersToProcess.map((player: any) => {
+    // Generate mock stats for each player
+    const playerStats: PlayerStats[] = mockPlayers.map(player => {
       let mockStats = getMockStatsById(player.id);
       if (!mockStats) {
         mockStats = generateMockStats(
@@ -67,11 +43,10 @@ export async function GET() {
           player.position
         );
       }
-
       return {
         player_id: player.id,
         player_name: `${player.first_name} ${player.last_name}`,
-        position: player.position || 'N/A',
+        position: player.position,
         pts: mockStats.stats.pts,
         ast: mockStats.stats.ast,
         reb: mockStats.stats.reb,
@@ -86,8 +61,7 @@ export async function GET() {
       metadata: {
         season: 2023,
         last_updated: new Date().toISOString(),
-        cached: true,
-        data_source: playersToProcess === mockPlayers ? 'Mock Data' : 'Hybrid - Real player data with mock statistics'
+        cached: true
       }
     }, {
       status: 200,
