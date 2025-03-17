@@ -1,3 +1,5 @@
+import { APIResponse } from "@/app/types/player";
+
 type CacheEntry<T> = {
   value: T;
   timestamp: number;
@@ -88,4 +90,23 @@ export async function withRetry<T>(
   }
   
   throw lastError;
+}
+
+export async function fetchFromAPI<T>(
+  endpoint: string,
+  options?: RequestInit
+): Promise<APIResponse<T>> {
+  const response = await fetch(endpoint, {
+    ...options,
+    headers: {
+      ...options?.headers,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`API Error: ${response.status}`);
+  }
+
+  return response.json();
 } 

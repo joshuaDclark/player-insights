@@ -3,8 +3,8 @@ export interface PlayerStats {
   player_name: string;
   position: string;
   pts: number;
-  ast: number;
   reb: number;
+  ast: number;
   fg_pct: number;
   fg3_pct: number;
   min: string;
@@ -44,9 +44,36 @@ export interface ProcessedPlayerStats extends PlayerStats {
   };
 }
 
+export interface APIResponse<T> {
+  data: T;
+  meta?: {
+    total_pages: number;
+    current_page: number;
+    next_page: number;
+    per_page: number;
+    total_count: number;
+  };
+  metadata?: {
+    season: number;
+    timestamp: string;
+    cached: boolean;
+  };
+}
+
+export interface ChartDataPoint {
+  name: string;
+  value: number;
+}
+
 export interface PlayerStatsResponse {
   data: PlayerStats[];
-  error?: string;
+  meta: {
+    total_pages: number;
+    current_page: number;
+    next_page: number;
+    per_page: number;
+    total_count: number;
+  };
 }
 
 export type PlayerStatsError = {
