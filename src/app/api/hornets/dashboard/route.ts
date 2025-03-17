@@ -3,21 +3,10 @@ import { PlayerStats } from '@/app/types/player';
 
 const CACHE_DURATION = 3600; // 1 hour
 
-// Get the base URL based on environment
-const getBaseUrl = () => {
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
-  }
-  return 'http://localhost:3000';
-};
-
 export async function GET() {
   try {
-    const baseUrl = getBaseUrl();
-    console.log('Attempting to fetch from:', `${baseUrl}/api/test/hornets/stats`);
-    
-    // Fetch data from our hybrid endpoint using absolute URL
-    const statsResponse = await fetch(`${baseUrl}/api/test/hornets/stats`);
+    // Fetch data from our internal endpoint using relative URL
+    const statsResponse = await fetch('/api/test/hornets/stats');
 
     if (!statsResponse.ok) {
       const errorText = await statsResponse.text();
@@ -41,7 +30,7 @@ export async function GET() {
       throw new Error('Invalid data format received from stats API');
     }
 
-    // Transform the hybrid endpoint data into our dashboard format
+    // Transform the data into our dashboard format
     const playerStats: PlayerStats[] = statsData.data.players.map((player: any) => ({
       player_id: player.player_id,
       player_name: player.player_name,
