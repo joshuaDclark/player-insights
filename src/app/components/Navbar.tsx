@@ -17,7 +17,7 @@ export default function Navbar() {
               href="/" 
               className="flex items-center space-x-2"
             >
-              <span className="text-2xl font-bold text-teal-600">FastBreak</span>
+              <span className="text-2xl font-bold text-teal-600">NBA Player</span>
               <span className="text-gray-600">Insights</span>
             </Link>
           </div>

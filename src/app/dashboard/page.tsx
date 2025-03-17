@@ -215,15 +215,15 @@ export default function DashboardPage() {
                     if (player) setSelectedPlayer(player);
                   }}
                 >
-                  <SelectTrigger className="bg-background">
+                  <SelectTrigger className="bg-white cursor-pointer">
                     <SelectValue placeholder="Select a player" />
                   </SelectTrigger>
-                  <SelectContent className="bg-popover border shadow-md">
+                  <SelectContent className="border shadow-md bg-white cursor-pointer">
                     {data.map((player) => (
                       <SelectItem 
                         key={player.player_id} 
                         value={player.player_id.toString()}
-                        className="hover:bg-muted/50 cursor-pointer"
+                        className="hover:bg-slate-200 cursor-pointer"
                       >
                         {player.player_name}
                       </SelectItem>

@@ -68,7 +68,7 @@ export default function Home() {
           Ready to elevate your game?
         </h2>
         <p className="text-gray-600 mb-8">
-          Join FastBreak Insights today and unlock the power of basketball analytics.
+          Join NBA Player Insights today and unlock the power of basketball analytics.
         </p>
         {!isLoading && !user && (
           <Link
