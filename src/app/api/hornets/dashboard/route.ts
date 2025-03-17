@@ -3,10 +3,18 @@ import { PlayerStats } from '@/app/types/player';
 
 const CACHE_DURATION = 3600; // 1 hour
 
+// Get the base URL based on environment
+const getBaseUrl = () => {
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return 'http://localhost:3000';
+};
+
 export async function GET() {
   try {
-    // Fetch data from our hybrid endpoint
-    const statsResponse = await fetch('/api/test/hornets/stats');
+    // Fetch data from our hybrid endpoint using absolute URL
+    const statsResponse = await fetch(`${getBaseUrl()}/api/test/hornets/stats`);
 
     if (!statsResponse.ok) {
       throw new Error(`Stats API error: ${statsResponse.status}`);
