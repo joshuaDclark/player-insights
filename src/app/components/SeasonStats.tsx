@@ -64,7 +64,7 @@ export default function SeasonStats({ data }: SeasonStatsProps) {
   return (
     <Card className="col-span-full">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Season Statistics</CardTitle>
+        <CardTitle className="text-2xl font-bold">2023-24 Season Statistics</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="rounded-lg border">

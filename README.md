@@ -1,41 +1,124 @@
-<<<<<<< HEAD
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Charlotte Hornets Player Insights Dashboard
+
+A modern, interactive dashboard built with Next.js and TypeScript that provides comprehensive statistics and insights for the Charlotte Hornets' 2023-24 NBA season.
+
+## Features
+
+### Season Statistics Table
+- Complete player statistics including points, rebounds, assists, FG%, and minutes
+- Sortable columns for easy comparison
+- Responsive design with horizontal scrolling for mobile devices
+
+### Player Performance Analytics
+- Interactive player leaderboard with top performers in various categories
+- Performance radar chart showing individual player statistics
+- Points distribution visualization
+- Shooting efficiency comparisons
+
+### Team Overview
+- Team-wide statistics and averages
+- Quick view of season leaders in key categories
+- Real-time data updates
+
+## Tech Stack
+
+- **Framework**: Next.js 14
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui
+- **Charts**: Recharts
+- **Authentication**: Auth0
+- **Data**: [Ball Don't Lie API](https://www.balldontlie.io)
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/player-insights.git
+cd player-insights
+```
 
+2. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+```
+
+3. Set up environment variables:
+```bash
+cp .env.example .env.local
+```
+
+4. Configure Auth0:
+- Follow the [Auth0 Next.js SDK Quickstart](https://auth0.com/docs/quickstart/webapp/nextjs) to set up your Auth0 application
+- Add the required Auth0 environment variables to your `.env.local` file
+- Configure the Auth0 callback URLs and allowed URLs in your Auth0 dashboard
+
+5. Get your Ball Don't Lie API key:
+- Sign up at [balldontlie.io](https://www.balldontlie.io)
+- Add your API key to the `.env.local` file
+
+6. Run the development server:
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+7. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/
+│   ├── api/           # API routes
+│   ├── components/    # React components
+│   ├── types/        # TypeScript types
+│   ├── utils/        # Utility functions
+│   └── dashboard/    # Dashboard page
+├── components/
+│   └── ui/           # Reusable UI components
+└── lib/              # Shared libraries
+```
 
-## Learn More
+## Features in Detail
 
-To learn more about Next.js, take a look at the following resources:
+### Season Statistics
+- Complete season statistics for all active roster players
+- Sortable columns for all statistical categories
+- Sticky header for better navigation
+- Responsive table with horizontal scroll
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Player Leaderboard
+- Top 5 players in each statistical category
+- Tabbed interface for easy category switching
+- Real-time updates as data changes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Performance Visualizations
+- Radar charts for individual player analysis
+- Distribution charts for team-wide comparisons
+- Shooting efficiency scatter plots
 
-## Deploy on Vercel
+### Team Overview
+- Quick statistics panel
+- Season averages and totals
+- Top performer highlights
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Contributing
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-=======
-# player-insights
-Dashboard displaying Charlotte Hornet Statistics
->>>>>>> eb24778caec8a467aef6d74f0d27f193346d99c4
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Data provided by [Ball Don't Lie API](https://www.balldontlie.io)
+- Built with shadcn/ui components
