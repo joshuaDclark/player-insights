@@ -1,18 +1,17 @@
 import { NextResponse } from 'next/server';
-import { PlayerStats } from '@/app/types/player';
+import type { PlayerStats } from '@/app/types/player';
 
 // This is mock data - replace with your actual data fetching logic
 const mockPlayerStats: PlayerStats[] = [
   {
-    player_id: 1,
-    player_name: 'LaMelo Ball',
-    position: 'PG',
-    pts: 23.9,
-    reb: 6.4,
-    ast: 8.4,
-    fg_pct: 0.442,
-    fg3_pct: 0.376,
-    min: '35:12'
+    id: '1',
+    name: 'LaMelo Ball',
+    pointsPerGame: 23.9,
+    rebounds: 6.4,
+    assists: 8.2,
+    fieldGoalPercentage: 44.2,
+    threePointPercentage: 37.8,
+    minutesPlayed: 33.5,
   },
   {
     id: '2',

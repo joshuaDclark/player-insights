@@ -27,8 +27,7 @@ A modern, interactive dashboard built with Next.js and TypeScript that provides 
 - **Styling**: Tailwind CSS
 - **UI Components**: shadcn/ui
 - **Charts**: Recharts
-- **Authentication**: Auth0
-- **Data**: [Ball Don't Lie API](https://www.balldontlie.io)
+- **Data**: Integration with NBA statistics API
 
 ## Getting Started
 
@@ -49,24 +48,16 @@ yarn install
 ```bash
 cp .env.example .env.local
 ```
+Add your API keys and configuration values to `.env.local`
 
-4. Configure Auth0:
-- Follow the [Auth0 Next.js SDK Quickstart](https://auth0.com/docs/quickstart/webapp/nextjs) to set up your Auth0 application
-- Add the required Auth0 environment variables to your `.env.local` file
-- Configure the Auth0 callback URLs and allowed URLs in your Auth0 dashboard
-
-5. Get your Ball Don't Lie API key:
-- Sign up at [balldontlie.io](https://www.balldontlie.io)
-- Add your API key to the `.env.local` file
-
-6. Run the development server:
+4. Run the development server:
 ```bash
 npm run dev
 # or
 yarn dev
 ```
 
-7. Open [http://localhost:3000](http://localhost:3000) in your browser
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ## Project Structure
 
@@ -120,5 +111,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- Data provided by [Ball Don't Lie API](https://www.balldontlie.io)
+- Data provided by NBA Statistics API
+- Design inspiration from NBA.com
 - Built with shadcn/ui components
