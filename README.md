@@ -18,7 +18,6 @@ A modern, interactive dashboard built with Next.js and TypeScript that provides 
 ### Team Overview
 - Team-wide statistics and averages
 - Quick view of season leaders in key categories
-- Real-time data updates
 
 ## Tech Stack
 
@@ -94,7 +93,6 @@ src/
 
 ### Team Overview
 - Quick statistics panel
-- Season averages and totals
 - Top performer highlights
 
 ## Contributing
@@ -111,6 +109,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- Data provided by NBA Statistics API
-- Design inspiration from NBA.com
+- Data provided by Ball Don't Lie API
 - Built with shadcn/ui components
